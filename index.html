@@ -1,0 +1,465 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow, noarchive">
+<title>Landlord's Calculus: 42 The Esplanade</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Figtree:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap">
+<style>
+/* Layout: a two-column negotiating table. Left = levers grouped by who controls them; right = the verdict, the two
+   cash streams side by side, and the walk-away bill. Accept = green, walk-away = coral, lease-as-signed = blue. */
+:root {
+  --bg: #f4f5fa; --panel: #ffffff; --panel-2: #eef0f8; --ink: #151a31; --ink-2: #4a5170; --ink-3: #7f86a3; --line: #dfe3ef;
+  --accept: #0fa36f; --walk: #ef5f3c; --lease: #3b6fe0; --gold: #d29b00; --violet: #8247d9;
+  --good: #0f9a62; --good-bg: #dbf4e8; --warn: #b97700; --warn-bg: #fdf0d0; --bad: #d03b3b; --bad-bg: #fde2e0;
+  --grad: linear-gradient(110deg, #3b6fe0 0%, #8247d9 35%, #ef5f3c 70%, #d29b00 100%);
+  --display: "Bricolage Grotesque", "Avenir Next", "Segoe UI", system-ui, sans-serif;
+  --body: "Figtree", "Helvetica Neue", "Segoe UI", system-ui, sans-serif;
+  --mono: "JetBrains Mono", ui-monospace, Menlo, monospace;
+  --shadow: 0 1px 2px rgba(21,26,49,.06), 0 10px 26px rgba(21,26,49,.06);
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #0e1222; --panel: #161b31; --panel-2: #1e2440; --ink: #eef0fa; --ink-2: #b4bbd6; --ink-3: #8188a8; --line: #2a3152;
+  --accept: #34d39b; --walk: #ff8664; --lease: #6f98ff; --gold: #f3c33a; --violet: #ad84ff;
+  --good: #3ddc97; --good-bg: #113a2b; --warn: #f5b73a; --warn-bg: #3b2e10; --bad: #ff6b6b; --bad-bg: #421b1f;
+  --shadow: 0 1px 2px rgba(0,0,0,.3), 0 10px 26px rgba(0,0,0,.25); color-scheme: dark; } }
+:root[data-theme="dark"] {
+  --bg: #0e1222; --panel: #161b31; --panel-2: #1e2440; --ink: #eef0fa; --ink-2: #b4bbd6; --ink-3: #8188a8; --line: #2a3152;
+  --accept: #34d39b; --walk: #ff8664; --lease: #6f98ff; --gold: #f3c33a; --violet: #ad84ff;
+  --good: #3ddc97; --good-bg: #113a2b; --warn: #f5b73a; --warn-bg: #3b2e10; --bad: #ff6b6b; --bad-bg: #421b1f;
+  --shadow: 0 1px 2px rgba(0,0,0,.3), 0 10px 26px rgba(0,0,0,.25); color-scheme: dark; }
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--ink); font-family: var(--body); font-size: 14.5px; line-height: 1.45; }
+.wrap { max-width: 1240px; margin: 0 auto; padding-inline: 20px; padding-block: 22px 44px; display: grid; gap: 18px; }
+.ribbon { height: 6px; border-radius: 6px; background: var(--grad); }
+.eyebrow { font-size: 11px; letter-spacing: .09em; text-transform: uppercase; color: var(--ink-3); font-weight: 700; }
+h1 { font-family: var(--display); font-weight: 800; font-size: clamp(27px, 4vw, 40px); line-height: 1.06; margin: 4px 0 6px; letter-spacing: -.01em; text-wrap: balance; }
+h1 em { font-style: normal; background: var(--grad); -webkit-background-clip: text; background-clip: text; color: transparent; }
+h2 { font-family: var(--display); font-weight: 800; font-size: 18px; margin: 0 0 10px; }
+h3 { font-family: var(--display); font-weight: 600; font-size: 15px; margin: 0 0 8px; display: flex; gap: 8px; align-items: center; }
+h3 i { width: 10px; height: 10px; border-radius: 3px; display: inline-block; }
+.lede { color: var(--ink-2); margin: 0; max-width: 78ch; }
+.panel { background: var(--panel); border: 1px solid var(--line); border-radius: 16px; padding: 18px; box-shadow: var(--shadow); min-width: 0; }
+.grid { display: grid; grid-template-columns: minmax(0, 400px) minmax(0, 1fr); gap: 18px; align-items: start; }
+@media (max-width: 900px) { .grid { grid-template-columns: 1fr; } }
+.levers { display: grid; gap: 14px; }
+.lgroup { display: grid; gap: 10px; padding: 12px; border-radius: 12px; background: var(--panel-2); }
+.lv { display: grid; gap: 2px; }
+.lv .row { display: flex; justify-content: space-between; gap: 8px; align-items: baseline; }
+.lv label { font-weight: 600; font-size: 13.5px; }
+.lv output { font-family: var(--mono); font-weight: 700; font-size: 14px; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.lv .hint { font-size: 11.5px; color: var(--ink-3); }
+input[type=range] { -webkit-appearance: none; appearance: none; width: 100%; height: 8px; border-radius: 999px; background: var(--line); margin: 6px 0 2px; accent-color: var(--c, var(--lease)); }
+input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; width: 20px; height: 20px; border-radius: 50%; background: var(--panel); border: 4px solid var(--c, var(--lease)); box-shadow: 0 1px 4px rgba(0,0,0,.25); cursor: grab; }
+input[type=range]::-moz-range-thumb { width: 14px; height: 14px; border-radius: 50%; background: var(--panel); border: 4px solid var(--c, var(--lease)); cursor: grab; }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.chip { font: 600 12.5px var(--body); border: 1.5px solid var(--line); background: var(--panel); color: var(--ink); border-radius: 999px; padding: 6px 11px; cursor: pointer; }
+.chip[aria-pressed="true"] { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+.chip:focus-visible, input:focus-visible, button:focus-visible { outline: 3px solid var(--gold); outline-offset: 2px; }
+.check { display: flex; gap: 8px; align-items: center; font-size: 13px; font-weight: 600; }
+.right { display: grid; gap: 18px; }
+.verdict { display: grid; grid-template-columns: minmax(0, 1fr); gap: 12px; }
+.vbadge { display: inline-flex; align-items: center; gap: 8px; font-weight: 800; font-size: 13px; padding: 6px 12px; border-radius: 999px; justify-self: start; }
+.vbadge.good { background: var(--good-bg); color: var(--good); } .vbadge.warn { background: var(--warn-bg); color: var(--warn); } .vbadge.bad { background: var(--bad-bg); color: var(--bad); }
+.vhead { font-family: var(--display); font-weight: 800; font-size: clamp(19px, 2.5vw, 25px); line-height: 1.2; text-wrap: balance; margin: 0; }
+.meter { position: relative; height: 46px; margin: 18px 0 30px; }
+.meter .bar { position: absolute; inset: 14px 0 14px 0; border-radius: 999px; background: linear-gradient(90deg, var(--violet) 0%, var(--accept) 35%, var(--accept) 62%, var(--gold) 82%, var(--walk) 100%); }
+.meter .mk { position: absolute; top: 0; width: 4px; height: 46px; border-radius: 2px; background: var(--ink); transform: translateX(-2px); }
+.meter .mk span { position: absolute; top: 50px; left: 50%; transform: translateX(-50%); font-size: 11.5px; white-space: nowrap; color: var(--ink); font-weight: 700; }
+.meter .mx { position: absolute; top: 6px; width: 2px; height: 34px; background: var(--ink-3); transform: translateX(-1px); }
+.meter .mx span { position: absolute; top: -18px; left: 50%; transform: translateX(-50%); font-size: 11px; white-space: nowrap; color: var(--ink-2); }
+.meter .zone { position: absolute; top: 50px; font-size: 10.5px; color: var(--ink-3); }
+.kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 10px; }
+.kpi { background: var(--panel-2); border-radius: 12px; padding: 11px 13px; border-top: 4px solid var(--c); display: grid; gap: 2px; }
+.kpi b { font-family: var(--mono); font-size: 19px; font-variant-numeric: tabular-nums; }
+.kpi span { font-size: 12px; color: var(--ink-2); }
+svg text { font-family: var(--body); fill: var(--ink-2); font-size: 11px; }
+.chart { width: 100%; height: auto; display: block; }
+.legend { display: flex; flex-wrap: wrap; gap: 14px; font-size: 12px; color: var(--ink-2); }
+.legend i { display: inline-block; width: 14px; height: 4px; border-radius: 2px; margin-right: 6px; vertical-align: middle; }
+.two { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 18px; }
+@media (max-width: 760px) { .two { grid-template-columns: 1fr; } }
+.cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(270px, 1fr)); gap: 12px; }
+.card { background: var(--panel-2); border-radius: 12px; padding: 12px 14px; border-left: 5px solid var(--c); }
+.card b { display: block; margin-bottom: 3px; }
+.card p { margin: 0; font-size: 13px; color: var(--ink-2); }
+.tag { display: inline-block; font-size: 10.5px; font-weight: 800; letter-spacing: .05em; text-transform: uppercase; padding: 1px 7px; border-radius: 6px; margin-bottom: 5px; }
+.tag.up { background: var(--bad-bg); color: var(--bad); } .tag.down { background: var(--good-bg); color: var(--good); } .tag.new { background: var(--warn-bg); color: var(--warn); }
+.notes { font-size: 12px; color: var(--ink-3); display: grid; gap: 4px; } .notes p { margin: 0; max-width: 120ch; }
+.scroll { overflow-x: auto; }
+table.t { border-collapse: collapse; width: 100%; font-size: 13px; font-variant-numeric: tabular-nums; }
+table.t td, table.t th { padding: 6px 6px; border-bottom: 1px solid var(--line); text-align: right; white-space: nowrap; }
+table.t th { font-size: 11px; text-transform: uppercase; letter-spacing: .05em; color: var(--ink-3); }
+table.t td:first-child, table.t th:first-child { text-align: left; }
+table.t tr.tot td { font-weight: 800; border-top: 2px solid var(--ink); border-bottom: 0; }
+.neg { color: var(--walk); } .pos { color: var(--accept); }
+</style>
+<style>html{color-scheme:light}body{margin:0;font-size:14.5px}[hidden]{display:none!important}img{max-width:100%}</style>
+</head>
+<body>
+
+
+<div class="wrap">
+  <div class="ribbon"></div>
+  <header>
+    <div class="eyebrow">42 The Esplanade · 5,652 sq ft · lease Years 2–10 · the landlord's side of the table</div>
+    <h1>Would the landlord rather <em>cut our rent</em> or <em>get the keys back</em>?</h1>
+    <p class="lede">Every lever below is something the landlord would weigh. Move them to see whether our proposal is reasonable to them, too aggressive, or leaves money on the table. Cash flows are monthly and discounted at the landlord's rate. Tax and operating costs pass through to whichever tenant is in the space.</p>
+  </header>
+
+  <div class="panel">
+    <div class="eyebrow" style="margin-bottom:8px">Start from a view of the market</div>
+    <div class="chips" id="presets"></div>
+  </div>
+
+  <div class="grid">
+    <section class="levers" aria-label="Levers">
+      <div class="lgroup" style="--c:var(--accept)"><h3><i style="background:var(--accept)"></i>Our proposal</h3><div id="g-prop"></div></div>
+      <div class="lgroup" style="--c:var(--walk)"><h3><i style="background:var(--walk)"></i>If we walk: re-leasing the space</h3><div id="g-relet"></div></div>
+      <div class="lgroup" style="--c:var(--gold)"><h3><i style="background:var(--gold)"></i>If we walk: what the landlord recovers or spends</h3><div id="g-rec"></div></div>
+      <div class="lgroup" style="--c:var(--violet)"><h3><i style="background:var(--violet)"></i>Landlord's finances</h3><div id="g-fin"></div></div>
+    </section>
+
+    <section class="right">
+      <div class="panel verdict" aria-live="polite">
+        <span class="vbadge" id="vbadge"></span>
+        <p class="vhead" id="vhead"></p>
+        <div class="meter" id="meter" aria-hidden="true"></div>
+        <div class="kpis" id="kpis"></div>
+      </div>
+      <div class="panel">
+        <h2>Present value to the landlord, over the remaining 9 years</h2>
+        <svg class="chart" id="bars" viewBox="0 0 760 210" role="img" aria-label="Present value comparison"></svg>
+      </div>
+      <div class="panel">
+        <h2>The walk-away bill: from the lease as signed to the keys back</h2>
+        <svg class="chart" id="water" viewBox="0 0 760 300" role="img" aria-label="Walk-away cost waterfall"></svg>
+      </div>
+      <div class="panel">
+        <h2>Cumulative cash to the landlord, month by month</h2>
+        <svg class="chart" id="cum" viewBox="0 0 760 260" role="img" aria-label="Cumulative cash"></svg>
+        <div class="legend" id="cumleg"></div>
+      </div>
+    </section>
+  </div>
+
+  <div class="two">
+    <section class="panel">
+      <h2>Rent per sq ft by lease year</h2>
+      <div class="scroll"><table class="t" id="rtable"></table></div>
+      <p class="notes" style="margin-top:8px">Market path = today's market rent growing at the new-deal escalation. The landlord compares our proposal against this line, not against the lease.</p>
+    </section>
+    <section class="panel">
+      <h2>The hidden cost: building value</h2>
+      <div id="value"></div>
+    </section>
+  </div>
+
+  <section class="panel">
+    <h2>Challenging the assumptions</h2>
+    <div class="cards">
+      <div class="card" style="--c:var(--walk)"><span class="tag up">could be lower</span><b>Vacancy may be shorter than we think</b><p>The space is a fully fitted, second-generation restaurant with a patio by the arenas. Operators are converting existing restaurants to avoid build-out costs, and the Bier Markt site down the street was re-let (to us, as Dolly's) within months. A landlord will argue 4–6 months, not 12.</p></div>
+      <div class="card" style="--c:var(--accept)"><span class="tag down">could be higher</span><b>…but the pool for a 5,600 sq ft box is thin</b><p>Demand is strongest for units under 2,000 sq ft. 41% of operators are losing money or breaking even, and Ontario restaurant insolvencies are up 7.5%. This would also be the second restaurant to fail here since 2024. Large asks nearby sit at $35–42.</p></div>
+      <div class="card" style="--c:var(--gold)"><span class="tag up">may be zero</span><b>Broker fees aren't a given</b><p>We signed this lease without a broker, about $150K saved on the commission. The landlord can lease direct again. Set commissions to 0% to test it.</p></div>
+      <div class="card" style="--c:var(--walk)"><span class="tag new">market check</span><b>Market rent is above our proposal, below the lease</b><p>Dolly's signed at about $35 net down the street in 2026. Size-comparable asks are $35–42. Our proposal starts at $31.35 and reaches $48.06 by Year 10. The lease runs $47–64. So the landlord's real loss from the proposal is the gap to market: about $9/sq ft in Year 2, shrinking to under $1 by Year 10 (see the rent table), not the full $15.68.</p></div>
+      <div class="card" style="--c:var(--accept)"><span class="tag down">lower than you'd think</span><b>Tenant improvements are small here</b><p>Our kitchen, bar and dining room stay with the building. A new restaurant needs $10–30/sq ft, not the $75–150 a shell needs. That's a real benefit to the landlord of us leaving behind a fitted space.</p></div>
+      <div class="card" style="--c:var(--gold)"><span class="tag new">benefit to landlord</span><b>Equipment, deposit, and a claim against us</b><p>Abandoned chattels can be sold, but at 5–15% of cost after fees and liens. The $48,866 deposit is applied. A damages claim against Esplanade Cocktail Company Ltd. (no guarantor in the lease) recovers little after legal fees. Equipment under lease or financing goes back to its owner.</p></div>
+      <div class="card" style="--c:var(--violet)"><span class="tag new">landlord's biggest issue</span><b>A lower face rent lowers the building's value</b><p>A permanent $88.6K/yr cut is worth about $1.5M less at a 5–6% cap rate. This matters to their lender and on any sale or refinance. A rent abatement or rebate that keeps the face rent at the lease schedule avoids it, and is the structure most likely to get a yes.</p></div>
+      <div class="card" style="--c:var(--lease)"><span class="tag new">other landlord costs</span><b>Dark space next to condo owners</b><p>Insurance on a vacant unit, base utilities, security, condo-board pressure, lender covenant tests, and no vacancy tax rebate (ended in Toronto in 2018). Additional rent of $28.84/sq ft, about $163K a year, falls on the landlord while the space is empty.</p></div>
+      <div class="card" style="--c:var(--accept)"><span class="tag new">landlord benefits of saying yes</span><b>A proven operator that's growing</b><p>Sales are up 29% year over year, with no downtime, no capital outlay and no leasing risk. A new restaurant tenant has its own failure risk (the "new-tenant failure risk" lever).</p></div>
+      <div class="card" style="--c:var(--walk)"><span class="tag up">risk to our side</span><b>What the landlord can do instead of re-leasing</b><p>Under <i>Highway Properties</i> a landlord can keep the lease alive and sue for rent as it falls due. Ontario's Court of Appeal (<i>Aphria</i>, 2024) says there is no duty to mitigate in that case, and the Supreme Court's ruling is pending. Against a single-purpose company with no guarantor, collecting is the hard part. Confirm with counsel; this is not legal advice.</p></div>
+    </div>
+  </section>
+
+  <section class="notes">
+    <p><b>Sources.</b> The lease schedule, the $48,866 deposit, no indemnifier, and improvements reverting to the landlord all come from the executed lease (Nov 14, 2024). Market defaults come from <i>landlord_market_research.md</i>: Lee &amp; Associates Q2 2026 (Toronto retail $36.36 NNN avg ask, 5.08% cap, 2.31% vacancy); JLL / Retail Insider (downtown availability 6.22%, F&amp;B the top leasing category); Colliers Urban Retail listings (151 Yonge $35, 33 Bloor E $42, 171–172 King E $39.50–40); Restaurants Canada 2026 outlook; StatCan; and Ontario case law (<i>Highway Properties</i> 1971; <i>Aphria</i> 2024 ONCA 882). Dolly's terms are internal.</p>
+    <p>Downtime, free rent, TI and commission defaults are estimates. Brokers don't publish them, so confirm with one call to a downtown retail broker. Horizon: lease Years 2–10, 108 months. A new tenant's lease beyond Year 10 is ignored on both sides.</p>
+  </section>
+</div>
+
+<script>
+// Landlord's calculus for 42 The Esplanade: accept Eloise's proposed rent schedule vs. take back the keys and re-lease.
+// Pure function, shared by the HTML tool and node tests. Monthly cash flows, discounted at the landlord's rate.
+// Horizon = the remaining committed lease term (lease Years 2–10 = 108 months) unless overridden.
+
+const LEASE_PSF = [47.03, 49.02, 51.11, 53.15, 55.28, 57.49, 59.79, 61.88, 63.74]; // Years 2..10
+const SF = 5652;
+
+function landlordModel(p) {
+  const months = p.horizonYears * 12;
+  const r = Math.pow(1 + p.discount, 1 / 12) - 1;                 // monthly discount rate
+  const disc = m => 1 / Math.pow(1 + r, m + 1);                    // cash at end of month m (0-based)
+  const leaseYear = m => Math.min(8, Math.floor(m / 12));          // index into LEASE_PSF
+  const addPsf = p.addRentPsf;                                    // realty tax + OPEX $/sq ft/yr (pass-through)
+
+  // ---- Option A: accept our proposal ----------------------------------------------------------
+  // Base rent = lease schedule − fixed annual cut. Additional rent is a pass-through (recovered), so it nets to zero.
+  // Credit risk: probability Eloise still fails within the term even with relief; if it does, landlord falls into the
+  // walk-away path at that point (approximated as a failure at the midpoint of the horizon).
+  const accept = [];
+  for (let m = 0; m < months; m++) {
+    const base = (LEASE_PSF[leaseYear(m)] * SF - p.annualCut) / 12;
+    accept.push(base);
+  }
+  // ---- Option B: refuse → tenant walks, landlord re-leases -----------------------------------------
+  function walkaway(startMonth) {
+    const cf = new Array(months).fill(0);
+    const t0 = startMonth;
+    // one-time recoveries at walk-away
+    cf[t0] += p.deposit;                                               // security deposit applied
+    cf[t0] += p.equipmentSale;                                         // sale of FF&E / chattels left behind (net of auction costs)
+    cf[t0] += p.claimRecovery;                                         // net expected recovery from suing the tenant (after legal fees)
+    cf[t0] -= p.legalReentry;                                          // legal, re-entry, lock change, make-safe, clean-out
+    // vacancy: no rent; landlord carries tax + OPEX share and vacant-unit costs
+    const vac = Math.round(p.downtimeMonths + p.fixturingMonths);
+    for (let m = t0; m < Math.min(months, t0 + vac); m++) cf[m] -= (addPsf * SF) / 12 + p.vacantCostMonthly;
+    // new tenant
+    const start = t0 + vac;                                            // new lease signed / possession
+    const free = Math.round(p.freeRentMonths);
+    const tiTotal = p.tiPsf * SF;
+    if (start < months) {
+      cf[Math.max(t0, start - Math.round(p.fixturingMonths))] -= tiTotal;                                            // tenant inducement paid at possession
+      // leasing commission on the new deal: pctFirst of net rent yrs 1-5 + pctLater of yrs 6-10, paid at signing
+      let comm = 0;
+      for (let y = 0; y < p.newTerm; y++) comm += p.marketPsf * Math.pow(1 + p.marketEsc, y) * SF * (y < 5 ? p.commFirst : p.commLater);
+      cf[start] -= comm;
+      for (let m = start; m < months; m++) {
+        const k = m - start, y = Math.floor(k / 12);
+        if (k < free) { continue; }                                    // free base rent (tenant pays additional rent during free period)
+        cf[m] += p.marketPsf * Math.pow(1 + p.marketEsc, y) * SF / 12 * (1 - p.newTenantRisk);
+      }
+      // during free-rent months the new tenant normally still pays additional rent → no landlord carry
+    }
+    // pre-walk months: we keep paying the full lease until we leave? (walk now = 0 months)
+    return cf;
+  }
+  // full walk-away now
+  const walk = walkaway(0);
+  // accept-with-risk: Eloise pays proposal until failure month, then walk-away path from that month
+  const failMonth = Math.floor(months * p.failTiming);
+  const failPath = accept.map((v, m) => (m < failMonth ? v : 0));
+  const wf = walkaway(failMonth);
+  for (let m = 0; m < months; m++) failPath[m] += wf[m];
+  const acceptBlend = accept.map((v, m) => (1 - p.eloiseFailProb) * v + p.eloiseFailProb * failPath[m]);
+  const leaseFull = accept.map((_, m) => LEASE_PSF[leaseYear(m)] * SF / 12);    // what the lease promises (if we paid in full)
+
+  const npv = cf => cf.reduce((s, v, m) => s + v * disc(m), 0);
+  const sum = cf => cf.reduce((s, v) => s + v, 0);
+  const out = {
+    npvAccept: npv(acceptBlend), npvAcceptNoRisk: npv(accept), npvWalk: npv(walk), npvLease: npv(leaseFull),
+    cashAccept: sum(acceptBlend), cashWalk: sum(walk), cashLease: sum(leaseFull),
+    acceptCF: acceptBlend, walkCF: walk, leaseCF: leaseFull,
+  };
+  out.advantage = out.npvAccept - out.npvWalk;                         // > 0 → landlord better off accepting
+  // walk-away cost breakdown (PV), each vs. the full-lease rent stream
+  const pv = (fn) => { let s = 0; for (let m = 0; m < months; m++) s += fn(m) * disc(m); return s; };
+  const vac = Math.round(p.downtimeMonths + p.fixturingMonths), free = Math.round(p.freeRentMonths), start = vac;
+  let comm = 0;
+  for (let y = 0; y < p.newTerm; y++) comm += p.marketPsf * Math.pow(1 + p.marketEsc, y) * SF * (y < 5 ? p.commFirst : p.commLater);
+  out.parts = {
+    lostRentVacancy: pv(m => (m < vac ? leaseFull[m] : 0)),
+    carryVacancy: pv(m => (m < vac ? (addPsf * SF) / 12 + p.vacantCostMonthly : 0)),
+    freeRent: pv(m => (m >= start && m < start + free ? p.marketPsf * SF / 12 : 0)),
+    lowerRent: pv(m => { if (m < start) return 0; const y = Math.floor((m - start) / 12); return leaseFull[m] - p.marketPsf * Math.pow(1 + p.marketEsc, y) * SF / 12; }),
+    newTenantRisk: pv(m => { if (m < start + free) return 0; const y = Math.floor((m - start) / 12); return p.marketPsf * Math.pow(1 + p.marketEsc, y) * SF / 12 * p.newTenantRisk; }),
+    ti: start < months ? p.tiPsf * SF * disc(start) : 0,
+    commission: start < months ? comm * disc(start) : 0,
+    legal: p.legalReentry * disc(0),
+    deposit: -p.deposit * disc(0), equipment: -p.equipmentSale * disc(0), claim: -p.claimRecovery * disc(0),
+  };
+  // the proposal's own cost to the landlord vs the lease
+  out.proposalCost = out.npvLease - out.npvAcceptNoRisk;
+  // break-even: the biggest fixed annual cut the landlord should rationally accept (advantage = 0)
+  const f = cut => { const a = quick(Object.assign({}, p, {annualCut: cut})); return a.npvAccept - a.npvWalk; };
+  out.maxCut = bisect(f, -200000, 400000);
+  out.capValueHit = p.annualCut / p.capRate;                          // asset value impact of a lower face rent (NOI ÷ cap rate)
+  return out;
+}
+// lightweight version (no break-even recursion) for the solver
+function quick(p) {
+  const months = p.horizonYears * 12, r = Math.pow(1 + p.discount, 1 / 12) - 1, disc = m => 1 / Math.pow(1 + r, m + 1);
+  const ly = m => Math.min(8, Math.floor(m / 12));
+  const walkPV = (t0) => {
+    let s = (p.deposit + p.equipmentSale + p.claimRecovery - p.legalReentry) * disc(t0);
+    const vac = Math.round(p.downtimeMonths + p.fixturingMonths), free = Math.round(p.freeRentMonths), start = t0 + vac;
+    for (let m = t0; m < Math.min(months, start); m++) s -= ((p.addRentPsf * SF) / 12 + p.vacantCostMonthly) * disc(m);
+    if (start < months) {
+      let comm = 0; for (let y = 0; y < p.newTerm; y++) comm += p.marketPsf * Math.pow(1 + p.marketEsc, y) * SF * (y < 5 ? p.commFirst : p.commLater);
+      s -= (p.tiPsf * SF + comm) * disc(start);
+      for (let m = start + free; m < months; m++) s += p.marketPsf * Math.pow(1 + p.marketEsc, Math.floor((m - start) / 12)) * SF / 12 * (1 - p.newTenantRisk) * disc(m);
+    }
+    return s;
+  };
+  let acc = 0, accFail = 0; const fm = Math.floor(months * p.failTiming);
+  for (let m = 0; m < months; m++) { const v = (LEASE_PSF[ly(m)] * SF - p.annualCut) / 12 * disc(m); acc += v; if (m < fm) accFail += v; }
+  accFail += walkPV(fm);
+  return { npvAccept: (1 - p.eloiseFailProb) * acc + p.eloiseFailProb * accFail, npvWalk: walkPV(0) };
+}
+function bisect(f, lo, hi) {
+  let flo = f(lo), fhi = f(hi);
+  if (flo * fhi > 0) return fhi > 0 ? hi : lo;
+  for (let i = 0; i < 60; i++) { const mid = (lo + hi) / 2, fm = f(mid); if (fm * flo > 0) { lo = mid; flo = fm; } else { hi = mid; } }
+  return (lo + hi) / 2;
+}
+
+
+(() => {
+  const $ = id => document.getElementById(id);
+  const fm = (x, d = 0) => (x < 0 ? "−$" : "$") + Math.abs(x).toLocaleString("en-CA", {maximumFractionDigits: d, minimumFractionDigits: d});
+  const fk = x => (x < 0 ? "−$" : "$") + (Math.abs(x) >= 1e6 ? (Math.abs(x) / 1e6).toFixed(2) + "M" : Math.round(Math.abs(x) / 1000) + "K");
+  const LEVERS = [
+    // group, key, label, min, max, step, fmt, hint
+    ["prop", "annualCut", "Annual base-rent cut we ask for", 0, 250000, 1000, v => fm(v), v => `$${(v / SF).toFixed(2)}/sq ft off every year · Robert's 4 months = $88,605`],
+    ["prop", "eloiseFailProb", "Chance Eloise fails anyway, even with the cut", 0, 0.6, 0.05, v => Math.round(v * 100) + "%", () => "If it does, the landlord ends up re-leasing later (assumed mid-term)"],
+    ["relet", "marketPsf", "Market net rent a new restaurant signs", 25, 60, 0.5, v => "$" + v.toFixed(2), () => "Dolly's ~$35 (2026) · asks $35–42 · lease Yr 2 $47.03"],
+    ["relet", "marketEsc", "Annual escalation on the new deal", 0.01, 0.045, 0.0025, v => (v * 100).toFixed(2) + "%", () => "Current listings 2.5% · our lease ~3.9%"],
+    ["relet", "downtimeMonths", "Months empty before a deal is signed", 0, 24, 1, v => v + " mo", () => "Marketing + negotiation · research default 6–9"],
+    ["relet", "fixturingMonths", "Fit-up period, no rent at all", 0, 6, 1, v => v + " mo", () => "We got 120 days; landlord carries tax and OPEX"],
+    ["relet", "freeRentMonths", "Free base-rent months for the new tenant", 0, 12, 1, v => v + " mo", () => "We got 3 · market 2–8"],
+    ["relet", "tiPsf", "Tenant improvement allowance", 0, 120, 5, v => "$" + v + "/sq ft", v => fm(v * SF) + " · 2nd-gen $10–60, shell $75–150"],
+    ["relet", "commFirst", "Broker commission, years 1–5", 0, 0.07, 0.005, v => (v * 100).toFixed(1) + "%", () => "Years 6–10 at half this rate · 0% = leases direct"],
+    ["relet", "newTenantRisk", "New-tenant failure risk (rent haircut)", 0, 0.35, 0.01, v => Math.round(v * 100) + "%", () => "Expected rent lost to a new operator failing"],
+    ["rec", "equipmentSale", "Equipment and furniture sold (net)", 0, 200000, 5000, v => fm(v), () => "Auction nets 5–15% of cost after fees and liens"],
+    ["rec", "claimRecovery", "Net recovery from suing us", 0, 300000, 5000, v => fm(v), () => "Single-purpose company, no guarantor · after legal fees"],
+    ["rec", "legalReentry", "Legal, re-entry, clean-out, marketing", 0, 100000, 2500, v => fm(v), () => "One-time"],
+    ["rec", "vacantCostMonthly", "Vacant-unit insurance, utilities, security", 0, 6000, 250, v => fm(v) + "/mo", () => "On top of $28.84/sq ft tax + OPEX they carry"],
+    ["fin", "discount", "Landlord's discount rate", 0.05, 0.12, 0.0025, v => (v * 100).toFixed(2) + "%", () => "Toronto retail cap 5.08% + single-tenant risk"],
+    ["fin", "capRate", "Cap rate (for the building-value view)", 0.04, 0.08, 0.0025, v => (v * 100).toFixed(2) + "%", () => "Lee & Associates Q2 2026: 5.08%"],
+  ];
+  const FIXED = {horizonYears: 9, addRentPsf: 28.84, deposit: 48866, newTerm: 10, failTiming: 0.5};
+  const PRESETS = {
+    base: {name: "Base case (research)", v: {annualCut: 88605, eloiseFailProb: 0.2, marketPsf: 40, marketEsc: 0.025, downtimeMonths: 9, fixturingMonths: 3, freeRentMonths: 4, tiPsf: 25, commFirst: 0.05, newTenantRisk: 0.1, equipmentSale: 40000, claimRecovery: 0, legalReentry: 25000, vacantCostMonthly: 1500, discount: 0.08, capRate: 0.055}},
+    landlord: {name: "Landlord's optimistic view", v: {annualCut: 88605, eloiseFailProb: 0.35, marketPsf: 48, marketEsc: 0.03, downtimeMonths: 4, fixturingMonths: 2, freeRentMonths: 2, tiPsf: 10, commFirst: 0, newTenantRisk: 0.05, equipmentSale: 80000, claimRecovery: 50000, legalReentry: 15000, vacantCostMonthly: 1000, discount: 0.07, capRate: 0.05}},
+    tough: {name: "Tough 2026 market", v: {annualCut: 88605, eloiseFailProb: 0.15, marketPsf: 35, marketEsc: 0.02, downtimeMonths: 15, fixturingMonths: 4, freeRentMonths: 6, tiPsf: 45, commFirst: 0.05, newTenantRisk: 0.15, equipmentSale: 25000, claimRecovery: 0, legalReentry: 35000, vacantCostMonthly: 2000, discount: 0.085, capRate: 0.0575}},
+  };
+  const st = Object.assign({}, PRESETS.base.v);
+  let preset = "base";
+
+  // build levers
+  for (const [g, key, label, min, max, step, fmt, hint] of LEVERS) {
+    const d = document.createElement("div"); d.className = "lv";
+    d.innerHTML = `<div class="row"><label for="lv-${key}">${label}</label><output id="o-${key}"></output></div><input type="range" id="lv-${key}" min="${min}" max="${max}" step="${step}"><div class="hint" id="h-${key}"></div>`;
+    $("g-" + g).appendChild(d);
+    d.querySelector("input").addEventListener("input", e => { st[key] = +e.target.value; preset = null; render(); });
+  }
+  const cutRow = document.createElement("div"); cutRow.className = "chips"; cutRow.style.marginTop = "2px";
+  cutRow.innerHTML = [[0, "No cut"], [44302, "Half"], [88605, "Our proposal"], [177209, "Double"]].map(([v, l]) => `<button class="chip" data-cut="${v}">${l}</button>`).join("");
+  $("g-prop").insertBefore(cutRow, $("g-prop").children[1]);
+  cutRow.addEventListener("click", e => { const b = e.target.closest("[data-cut]"); if (!b) return; st.annualCut = +b.dataset.cut; preset = null; render(); });
+  $("presets").innerHTML = Object.entries(PRESETS).map(([k, p]) => `<button class="chip" data-p="${k}">${p.name}</button>`).join("");
+  $("presets").addEventListener("click", e => { const b = e.target.closest("[data-p]"); if (!b) return; preset = b.dataset.p; Object.assign(st, PRESETS[preset].v); render(); });
+
+  const params = () => Object.assign({}, FIXED, st, {commLater: st.commFirst / 2});
+
+  function verdict(o) {
+    const ratio = st.annualCut / Math.max(1, o.maxCut);
+    if (o.maxCut <= 0) return {cls: "bad", badge: "Too aggressive", head: `On these assumptions the landlord does better re-leasing than giving any cut at all.`};
+    if (ratio > 1) return {cls: "bad", badge: "Too aggressive", head: `The landlord is ${fk(-o.advantage)} better off taking the keys back. The most they should rationally give is ${fk(o.maxCut)} a year.`};
+    if (ratio > 0.8) return {cls: "warn", badge: "Reasonable, but tight", head: `Accepting beats re-leasing by ${fk(o.advantage)}, but there's little cushion: the break-even cut is ${fk(o.maxCut)} a year.`};
+    if (ratio >= 0.45) return {cls: "good", badge: "Reasonable to the landlord", head: `Accepting our proposal leaves the landlord ${fk(o.advantage)} better off than re-leasing. They could rationally give up to ${fk(o.maxCut)} a year.`};
+    return {cls: "good", badge: "Not aggressive enough", head: `We're asking for well under what the landlord should accept: ${fk(st.annualCut)} a year vs a break-even of ${fk(o.maxCut)}. There's room to ask for more.`};
+  }
+
+  function render() {
+    for (const [, key, , , , , fmt, hint] of LEVERS) { $("lv-" + key).value = st[key]; $("o-" + key).textContent = fmt(st[key]); $("h-" + key).textContent = hint(st[key]); }
+    for (const b of $("presets").children) b.setAttribute("aria-pressed", b.dataset.p === preset);
+    for (const b of cutRow.children) b.setAttribute("aria-pressed", Math.abs(+b.dataset.cut - st.annualCut) < 500);
+    const p = params(), o = landlordModel(p), v = verdict(o);
+    $("vbadge").className = "vbadge " + v.cls; $("vbadge").textContent = v.badge; $("vhead").textContent = v.head;
+
+    // meter: 0 → 1.6× maxCut
+    const top = Math.max(o.maxCut * 1.6, st.annualCut * 1.15, 50000), pos = x => Math.max(0, Math.min(100, x / top * 100));
+    $("meter").innerHTML = `<div class="bar"></div>` +
+      `<div class="mx" style="left:${pos(o.maxCut)}%"><span>break-even ${fk(o.maxCut)}/yr</span></div>` +
+      `<div class="mk" style="left:${pos(st.annualCut)}%"><span>our ask ${fk(st.annualCut)}/yr</span></div>` +
+      `<div class="zone" style="left:0">← room to ask more</div><div class="zone" style="right:0">too aggressive →</div>`;
+
+    const kp = [
+      {c: "--accept", v: fk(o.npvAccept), l: "landlord PV if they accept (incl. our failure risk)"},
+      {c: "--walk", v: fk(o.npvWalk), l: "landlord PV if they take the keys back"},
+      {c: "--lease", v: fk(o.proposalCost), l: "PV cost of our cut vs the lease as signed"},
+      {c: "--gold", v: fk(o.npvLease - o.npvWalk), l: "PV cost of losing us vs the lease"},
+    ];
+    $("kpis").innerHTML = kp.map(k => `<div class="kpi" style="--c:var(${k.c})"><b>${k.v}</b><span>${k.l}</span></div>`).join("");
+    bars(o); water(o); cum(o); rtable(); value(o);
+  }
+
+  function bars(o) {
+    const items = [["Lease as signed (if we could pay it)", o.npvLease, "--lease"], ["Accept our proposal", o.npvAccept, "--accept"], ["Take the keys back", o.npvWalk, "--walk"]];
+    const max = Math.max(...items.map(i => Math.abs(i[1]))) * 1.08, L = 230, W = 760 - L - 70;
+    let g = "";
+    items.forEach(([lab, v, c], i) => {
+      const y = 18 + i * 62, w = Math.abs(v) / max * W;
+      g += `<text x="${L - 10}" y="${y + 24}" text-anchor="end" style="font-size:12.5px;fill:var(--ink)">${lab}</text>`;
+      g += `<rect x="${L}" y="${y}" width="${Math.max(2, w)}" height="38" rx="6" fill="var(${c})"/>`;
+      g += `<text x="${L + w + 8}" y="${y + 24}" style="font-family:var(--mono);font-weight:700;font-size:13px;fill:var(--ink)">${fk(v)}</text>`;
+    });
+    $("bars").innerHTML = g;
+  }
+
+  function water(o) {
+    const P = o.parts;
+    const steps = [["Lease as signed", o.npvLease, "start"], ["Rent lost while empty", -P.lostRentVacancy], ["Tax + OPEX they carry", -P.carryVacancy], ["Free rent to new tenant", -P.freeRent],
+      ["Lower market rent", -P.lowerRent], ["New-tenant failure risk", -P.newTenantRisk], ["Tenant improvements", -P.ti], ["Broker commission", -P.commission], ["Legal & re-entry", -P.legal],
+      ["Deposit kept", -P.deposit], ["Equipment sold", -P.equipment], ["Claim vs us", -P.claim], ["Keys back", o.npvWalk, "end"]];
+    const W = 760, H = 300, L = 54, B = 92, T = 16, n = steps.length, bw = (W - L - 10) / n;
+    const vals = []; let run = 0; for (const s of steps) { if (s[2] === "start") { run = s[1]; vals.push(run); } else if (s[2] === "end") vals.push(s[1]); else { run += s[1]; vals.push(run); } }
+    const mx = Math.max(o.npvLease, ...vals) * 1.05, mn = Math.min(0, ...vals) * 1.05, Y = v => T + (mx - v) / (mx - mn) * (H - T - B);
+    let g = `<line x1="${L}" x2="${W - 10}" y1="${Y(0)}" y2="${Y(0)}" stroke="var(--line)"/>`;
+    for (let t = 0; t <= mx; t += 500000) g += `<line x1="${L}" x2="${W - 10}" y1="${Y(t)}" y2="${Y(t)}" stroke="var(--line)" stroke-dasharray="2 4"/><text x="${L - 6}" y="${Y(t) + 4}" text-anchor="end">${fk(t)}</text>`;
+    let prev = 0;
+    steps.forEach((s, i) => {
+      const x = L + i * bw + 3, w = bw - 6;
+      let y0, y1, col;
+      if (s[2] === "start") { y0 = Y(s[1]); y1 = Y(0); col = "--lease"; prev = s[1]; }
+      else if (s[2] === "end") { y0 = Y(s[1]); y1 = Y(0); col = "--walk"; }
+      else { const nv = prev + s[1]; y0 = Y(Math.max(prev, nv)); y1 = Y(Math.min(prev, nv)); col = s[1] < 0 ? "--walk" : "--accept"; prev = nv; }
+      const op = s[2] ? 1 : .78;
+      g += `<rect x="${x}" y="${Math.min(y0, y1)}" width="${w}" height="${Math.max(1.5, Math.abs(y1 - y0))}" rx="3" fill="var(${col})" opacity="${op}"/>`;
+      const val = s[2] ? s[1] : s[1];
+      if (Math.abs(val) > 3000) g += `<text x="${x + w / 2}" y="${Math.min(y0, y1) - 4}" text-anchor="middle" style="font-size:9.5px;font-family:var(--mono);fill:var(--ink)">${s[2] ? fk(val) : (val > 0 ? "+" : "−") + fk(Math.abs(val)).slice(1)}</text>`;
+      g += `<text transform="translate(${x + w / 2},${H - B + 10}) rotate(40)" style="font-size:10.5px">${s[0]}</text>`;
+    });
+    $("water").innerHTML = g;
+  }
+
+  function cum(o) {
+    const W = 760, H = 260, L = 58, R = 14, T = 12, B = 30, n = o.acceptCF.length;
+    const acc = [], wlk = [], lse = []; let a = 0, w = 0, l = 0;
+    for (let m = 0; m < n; m++) { a += o.acceptCF[m]; w += o.walkCF[m]; l += o.leaseCF[m]; acc.push(a); wlk.push(w); lse.push(l); }
+    const mx = Math.max(...lse) * 1.05, mn = Math.min(0, ...wlk) * 1.1, X = m => L + m / (n - 1) * (W - L - R), Y = v => T + (mx - v) / (mx - mn) * (H - T - B);
+    let g = "";
+    for (let t = Math.ceil(mn / 500000) * 500000; t <= mx; t += 500000) g += `<line x1="${L}" x2="${W - R}" y1="${Y(t)}" y2="${Y(t)}" stroke="var(--line)"/><text x="${L - 6}" y="${Y(t) + 4}" text-anchor="end">${fk(t)}</text>`;
+    for (let y = 0; y <= 9; y++) g += `<text x="${X(Math.min(n - 1, y * 12))}" y="${H - 10}" text-anchor="middle">${y === 0 ? "now" : "Yr " + (y + 1)}</text>`;
+    const path = (arr, c, wd, dash = "") => `<path d="${arr.map((v, m) => (m ? "L" : "M") + X(m).toFixed(1) + "," + Y(v).toFixed(1)).join("")}" fill="none" stroke="var(${c})" stroke-width="${wd}" ${dash ? `stroke-dasharray="${dash}"` : ""}/>`;
+    g += path(lse, "--lease", 2, "6 5") + path(wlk, "--walk", 3) + path(acc, "--accept", 3);
+    // crossover note
+    $("cum").innerHTML = g;
+    $("cumleg").innerHTML = `<span><i style="background:var(--accept)"></i>Accept our proposal: ${fk(a)} undiscounted</span><span><i style="background:var(--walk)"></i>Take the keys back: ${fk(w)}</span><span><i style="background:var(--lease)"></i>Lease as signed: ${fk(l)}</span>` +
+      `<span><b>${a >= w ? "Accepting" : "Re-leasing"} ends ${fk(Math.abs(a - w))} ahead</b> after 9 years, before discounting.</span>`;
+  }
+
+  function rtable() {
+    let h = `<tr><th>Lease year</th><th>Lease</th><th>Our proposal</th><th>Market path</th><th>Proposal vs market</th></tr>`;
+    for (let i = 0; i < 9; i++) {
+      const lease = LEASE_PSF[i], prop = lease - st.annualCut / SF, mkt = st.marketPsf * Math.pow(1 + st.marketEsc, i), d = prop - mkt;
+      h += `<tr><td>Year ${i + 2}</td><td>$${lease.toFixed(2)}</td><td style="color:var(--accept);font-weight:700">$${prop.toFixed(2)}</td><td>$${mkt.toFixed(2)}</td><td class="${d < 0 ? "neg" : "pos"}">${d < 0 ? "−" : "+"}$${Math.abs(d).toFixed(2)}</td></tr>`;
+    }
+    $("rtable").innerHTML = h;
+  }
+
+  function value(o) {
+    const hit = st.annualCut / st.capRate;
+    $("value").innerHTML = `<div class="kpis" style="margin-bottom:10px"><div class="kpi" style="--c:var(--violet)"><b>${fk(hit)}</b><span>drop in appraised value from a permanent ${fk(st.annualCut)}/yr cut at a ${(st.capRate * 100).toFixed(2)}% cap rate</span></div>` +
+      `<div class="kpi" style="--c:var(--accept)"><b>$0</b><span>value drop if the same relief is a rent abatement/rebate and the face rent stays at the lease schedule</span></div></div>` +
+      `<p style="margin:0;font-size:13.5px;color:var(--ink-2)">Landlords and lenders value a building on its rent roll. A permanent cut shows up in the appraisal and the loan covenants. A <b>rebate</b> with the same cash effect doesn't, especially one tied to a sales threshold or that expires if we're sold. This is the cheapest yes we can offer: same cash to us, no value hit to them.</p>`;
+  }
+  render();
+})();
+</script>
+
+</body>
+</html>
