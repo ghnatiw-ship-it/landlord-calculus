@@ -59,6 +59,13 @@ input[type=range]::-moz-range-thumb { width: 14px; height: 14px; border-radius: 
 .chip { font: 600 12.5px var(--body); border: 1.5px solid var(--line); background: var(--panel); color: var(--ink); border-radius: 999px; padding: 6px 11px; cursor: pointer; }
 .chip[aria-pressed="true"] { background: var(--ink); color: var(--bg); border-color: var(--ink); }
 .chip:focus-visible, input:focus-visible, button:focus-visible { outline: 3px solid var(--gold); outline-offset: 2px; }
+.realrow { display: grid; gap: 6px; margin-top: 12px; padding-top: 12px; border-top: 1px dashed var(--line); }
+.seg { display: inline-flex; background: var(--panel-2); border-radius: 12px; padding: 4px; gap: 4px; flex-wrap: wrap; justify-self: start; }
+.seg button { font: 600 13px var(--body); border: 0; border-radius: 9px; padding: 8px 14px; background: transparent; color: var(--ink-2); cursor: pointer; display: grid; gap: 1px; text-align: left; }
+.seg button small { font-weight: 500; font-size: 11px; color: var(--ink-3); }
+.seg button[aria-pressed="true"] { background: var(--panel); color: var(--ink); box-shadow: var(--shadow); }
+.seg button[aria-pressed="true"] small { color: var(--ink-2); }
+.sub { font-size: 12px; color: var(--ink-3); }
 .check { display: flex; gap: 8px; align-items: center; font-size: 13px; font-weight: 600; }
 .right { display: grid; gap: 18px; }
 .verdict { display: grid; grid-template-columns: minmax(0, 1fr); gap: 12px; }
@@ -113,6 +120,11 @@ table.t tr.tot td { font-weight: 800; border-top: 2px solid var(--ink); border-b
   <div class="panel">
     <div class="eyebrow" style="margin-bottom:8px">Start from a view of the market</div>
     <div class="chips" id="presets"></div>
+    <div id="realRow" class="realrow" hidden>
+      <div class="eyebrow">Realistic range</div>
+      <div class="seg" id="realLevels" role="group" aria-label="Realistic range level"></div>
+      <div class="sub" id="realNote"></div>
+    </div>
   </div>
 
   <div class="grid">
@@ -335,6 +347,15 @@ function bisect(f, lo, hi) {
     landlord: {name: "Landlord's optimistic view", v: {annualCut: 88605, eloiseFailProb: 0.35, marketPsf: 48, marketEsc: 0.03, downtimeMonths: 4, fixturingMonths: 2, freeRentMonths: 2, tiPsf: 10, commFirst: 0, newTenantRisk: 0.05, equipmentSale: 80000, claimRecovery: 50000, legalReentry: 15000, vacantCostMonthly: 1000, discount: 0.07, capRate: 0.05}},
     tough: {name: "Tough 2026 market", v: {annualCut: 88605, eloiseFailProb: 0.15, marketPsf: 35, marketEsc: 0.02, downtimeMonths: 15, fixturingMonths: 4, freeRentMonths: 6, tiPsf: 45, commFirst: 0.05, newTenantRisk: 0.15, equipmentSale: 25000, claimRecovery: 0, legalReentry: 35000, vacantCostMonthly: 2000, discount: 0.085, capRate: 0.0575}},
   };
+  PRESETS.realistic = {name: "Realistic", v: null};
+  // Realistic ranges, reviewed 2026-10-22 (landlord_assumption_ranges.md). Our ask is left as currently set.
+  const REAL = {
+    low: {name: "Low", note: "Every lever at the end most optimistic for the landlord: re-leasing looks attractive.", v: {marketPsf: 45, marketEsc: 0.045, downtimeMonths: 3, fixturingMonths: 2, freeRentMonths: 2, tiPsf: 0, commFirst: 0, newTenantRisk: 0.05, equipmentSale: 80000, claimRecovery: 150000, legalReentry: 10000, vacantCostMonthly: 500, discount: 0.065, capRate: 0.06, eloiseFailProb: 0.35}},
+    medium: {name: "Medium", note: "Best single estimate for every lever.", v: {marketPsf: 38, marketEsc: 0.03, downtimeMonths: 8, fixturingMonths: 3, freeRentMonths: 4, tiPsf: 15, commFirst: 0.04, newTenantRisk: 0.12, equipmentSale: 35000, claimRecovery: 10000, legalReentry: 25000, vacantCostMonthly: 800, discount: 0.08, capRate: 0.0525, eloiseFailProb: 0.2}},
+    high: {name: "High", note: "Every lever at the end most pessimistic for the landlord: losing Eloise is expensive.", v: {marketPsf: 30, marketEsc: 0.02, downtimeMonths: 18, fixturingMonths: 7, freeRentMonths: 8, tiPsf: 50, commFirst: 0.06, newTenantRisk: 0.25, equipmentSale: 10000, claimRecovery: 0, legalReentry: 60000, vacantCostMonthly: 2000, discount: 0.10, capRate: 0.0475, eloiseFailProb: 0.1}},
+  };
+  const REAL_SUB = {low: "optimistic for landlord", medium: "realistic", high: "pessimistic for landlord"};
+  let realLevel = "medium";
   const st = Object.assign({}, PRESETS.base.v);
   let preset = "base";
 
@@ -350,7 +371,10 @@ function bisect(f, lo, hi) {
   $("g-prop").insertBefore(cutRow, $("g-prop").children[1]);
   cutRow.addEventListener("click", e => { const b = e.target.closest("[data-cut]"); if (!b) return; st.annualCut = +b.dataset.cut; preset = null; render(); });
   $("presets").innerHTML = Object.entries(PRESETS).map(([k, p]) => `<button class="chip" data-p="${k}">${p.name}</button>`).join("");
-  $("presets").addEventListener("click", e => { const b = e.target.closest("[data-p]"); if (!b) return; preset = b.dataset.p; Object.assign(st, PRESETS[preset].v); render(); });
+  $("presets").addEventListener("click", e => { const b = e.target.closest("[data-p]"); if (!b) return; preset = b.dataset.p;
+    Object.assign(st, preset === "realistic" ? REAL[realLevel].v : PRESETS[preset].v); render(); });
+  $("realLevels").innerHTML = Object.entries(REAL).map(([k, r]) => `<button id="rl-${k}" data-r="${k}">${r.name}<small>${REAL_SUB[k]}</small></button>`).join("");
+  $("realLevels").addEventListener("click", e => { const b = e.target.closest("[data-r]"); if (!b) return; realLevel = b.dataset.r; preset = "realistic"; Object.assign(st, REAL[realLevel].v); render(); });
 
   const params = () => Object.assign({}, FIXED, st, {commLater: st.commFirst / 2});
 
@@ -366,6 +390,9 @@ function bisect(f, lo, hi) {
   function render() {
     for (const [, key, , , , , fmt, hint] of LEVERS) { $("lv-" + key).value = st[key]; $("o-" + key).textContent = fmt(st[key]); $("h-" + key).textContent = hint(st[key]); }
     for (const b of $("presets").children) b.setAttribute("aria-pressed", b.dataset.p === preset);
+    $("realRow").hidden = preset !== "realistic";
+    for (const b of $("realLevels").children) b.setAttribute("aria-pressed", preset === "realistic" && b.dataset.r === realLevel);
+    $("realNote").textContent = preset === "realistic" ? REAL[realLevel].note + " Move any slider to fine-tune." : "";
     for (const b of cutRow.children) b.setAttribute("aria-pressed", Math.abs(+b.dataset.cut - st.annualCut) < 500);
     const p = params(), o = landlordModel(p), v = verdict(o);
     $("vbadge").className = "vbadge " + v.cls; $("vbadge").textContent = v.badge; $("vhead").textContent = v.head;
