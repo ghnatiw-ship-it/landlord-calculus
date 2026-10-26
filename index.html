@@ -349,10 +349,10 @@ function bisect(f, lo, hi) {
     tough: {name: "Tough 2026 market", v: {annualCut: 88605, eloiseFailProb: 0.15, marketPsf: 35, marketEsc: 0.02, downtimeMonths: 15, fixturingMonths: 4, freeRentMonths: 6, tiPsf: 45, commFirst: 0.05, newTenantRisk: 0.15, equipmentSale: 25000, claimRecovery: 0, legalReentry: 35000, vacantCostMonthly: 2000, discount: 0.085, capRate: 0.0575}},
   };
   PRESETS.realistic = {name: "Realistic", v: null};
-  // ER Calculation: Graham's own assumptions (2026-10-26). Our ask is left as currently set. Equipment, TI and Eloise-fail
+  // ER Calculation: Graham's own assumptions (2026-10-26). Our ask is left as currently set. TI and Eloise-fail
   // were not specified, so they use the Realistic·Medium values.
-  PRESETS.er = {name: "ER Calculation", note: "ER Calculation: $40 rent, 4% increases, 9 months empty, 4 months fit-up with no rent, 3 months free base rent, 4.5% broker, 25% new-tenant failure, $0 from suing us, $22K legal, $1.5K/mo insurance and utilities, 9% discount rate, 6.25% cap rate. Equipment ($35K), fit-out allowance ($15/sq ft) and Eloise failure (20%) use the Realistic·Medium values.",
-    v: {marketPsf: 40, marketEsc: 0.04, downtimeMonths: 9, fixturingMonths: 4, freeRentMonths: 3, tiPsf: 15, commFirst: 0.045, newTenantRisk: 0.25, equipmentSale: 35000, claimRecovery: 0, legalReentry: 22000, vacantCostMonthly: 1500, discount: 0.09, capRate: 0.0625, eloiseFailProb: 0.2}};
+  PRESETS.er = {name: "ER Calculation", note: "ER Calculation: $40 rent, 4% increases, 9 months empty, 4 months fit-up with no rent, 3 months free base rent, 4.5% broker, 25% new-tenant failure, $0 from suing us, $22K legal, $1.5K/mo insurance and utilities, 9% discount rate, 6.25% cap rate. $40K equipment recovery. Fit-out allowance ($15/sq ft) and Eloise failure (20%) use the Realistic·Medium values.",
+    v: {marketPsf: 40, marketEsc: 0.04, downtimeMonths: 9, fixturingMonths: 4, freeRentMonths: 3, tiPsf: 15, commFirst: 0.045, newTenantRisk: 0.25, equipmentSale: 40000, claimRecovery: 0, legalReentry: 22000, vacantCostMonthly: 1500, discount: 0.09, capRate: 0.0625, eloiseFailProb: 0.2}};
   // Realistic ranges, reviewed 2026-10-22 (landlord_assumption_ranges.md). Our ask is left as currently set.
   const REAL = {
     low: {name: "Low", note: "Every lever at the end most optimistic for the landlord: re-leasing looks attractive.", v: {marketPsf: 45, marketEsc: 0.045, downtimeMonths: 3, fixturingMonths: 2, freeRentMonths: 2, tiPsf: 0, commFirst: 0, newTenantRisk: 0.05, equipmentSale: 80000, claimRecovery: 150000, legalReentry: 10000, vacantCostMonthly: 500, discount: 0.065, capRate: 0.06, eloiseFailProb: 0.35}},
