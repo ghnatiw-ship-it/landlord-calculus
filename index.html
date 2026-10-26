@@ -108,7 +108,6 @@ table.t tr.tot td { font-weight: 800; border-top: 2px solid var(--ink); border-b
 </head>
 <body>
 
-
 <div class="wrap">
   <div class="ribbon"></div>
   <header>
@@ -125,6 +124,7 @@ table.t tr.tot td { font-weight: 800; border-top: 2px solid var(--ink); border-b
       <div class="seg" id="realLevels" role="group" aria-label="Realistic range level"></div>
       <div class="sub" id="realNote"></div>
     </div>
+    <div class="sub" id="presetNote" hidden></div>
   </div>
 
   <div class="grid">
@@ -213,7 +213,8 @@ function landlordModel(p) {
   // walk-away path at that point (approximated as a failure at the midpoint of the horizon).
   const accept = [];
   for (let m = 0; m < months; m++) {
-    const base = (LEASE_PSF[leaseYear(m)] * SF - p.annualCut) / 12;
+    const cut = p.cutByYear ? p.cutByYear[leaseYear(m)] : p.annualCut;   // optional year-by-year schedule
+    const base = (LEASE_PSF[leaseYear(m)] * SF - cut) / 12;
     accept.push(base);
   }
   // ---- Option B: refuse → tenant walks, landlord re-leases -----------------------------------------
@@ -306,7 +307,7 @@ function quick(p) {
     return s;
   };
   let acc = 0, accFail = 0; const fm = Math.floor(months * p.failTiming);
-  for (let m = 0; m < months; m++) { const v = (LEASE_PSF[ly(m)] * SF - p.annualCut) / 12 * disc(m); acc += v; if (m < fm) accFail += v; }
+  for (let m = 0; m < months; m++) { const v = (LEASE_PSF[ly(m)] * SF - (p.cutByYear ? p.cutByYear[ly(m)] : p.annualCut)) / 12 * disc(m); acc += v; if (m < fm) accFail += v; }
   accFail += walkPV(fm);
   return { npvAccept: (1 - p.eloiseFailProb) * acc + p.eloiseFailProb * accFail, npvWalk: walkPV(0) };
 }
@@ -348,6 +349,10 @@ function bisect(f, lo, hi) {
     tough: {name: "Tough 2026 market", v: {annualCut: 88605, eloiseFailProb: 0.15, marketPsf: 35, marketEsc: 0.02, downtimeMonths: 15, fixturingMonths: 4, freeRentMonths: 6, tiPsf: 45, commFirst: 0.05, newTenantRisk: 0.15, equipmentSale: 25000, claimRecovery: 0, legalReentry: 35000, vacantCostMonthly: 2000, discount: 0.085, capRate: 0.0575}},
   };
   PRESETS.realistic = {name: "Realistic", v: null};
+  // ER Calculation: Graham's own assumptions (2026-10-26). Our ask is left as currently set. Equipment, TI and Eloise-fail
+  // were not specified, so they use the Realistic·Medium values.
+  PRESETS.er = {name: "ER Calculation", note: "ER Calculation: $40 rent, 4% increases, 9 months empty, 4 months fit-up with no rent, 3 months free base rent, 4.5% broker, 25% new-tenant failure, $0 from suing us, $22K legal, $1.5K/mo insurance and utilities, 9% discount rate, 6.25% cap rate. Equipment ($35K), fit-out allowance ($15/sq ft) and Eloise failure (20%) use the Realistic·Medium values.",
+    v: {marketPsf: 40, marketEsc: 0.04, downtimeMonths: 9, fixturingMonths: 4, freeRentMonths: 3, tiPsf: 15, commFirst: 0.045, newTenantRisk: 0.25, equipmentSale: 35000, claimRecovery: 0, legalReentry: 22000, vacantCostMonthly: 1500, discount: 0.09, capRate: 0.0625, eloiseFailProb: 0.2}};
   // Realistic ranges, reviewed 2026-10-22 (landlord_assumption_ranges.md). Our ask is left as currently set.
   const REAL = {
     low: {name: "Low", note: "Every lever at the end most optimistic for the landlord: re-leasing looks attractive.", v: {marketPsf: 45, marketEsc: 0.045, downtimeMonths: 3, fixturingMonths: 2, freeRentMonths: 2, tiPsf: 0, commFirst: 0, newTenantRisk: 0.05, equipmentSale: 80000, claimRecovery: 150000, legalReentry: 10000, vacantCostMonthly: 500, discount: 0.065, capRate: 0.06, eloiseFailProb: 0.35}},
@@ -393,6 +398,8 @@ function bisect(f, lo, hi) {
     $("realRow").hidden = preset !== "realistic";
     for (const b of $("realLevels").children) b.setAttribute("aria-pressed", preset === "realistic" && b.dataset.r === realLevel);
     $("realNote").textContent = preset === "realistic" ? REAL[realLevel].note + " Move any slider to fine-tune." : "";
+    $("presetNote").hidden = !(preset && PRESETS[preset].note);
+    $("presetNote").textContent = preset && PRESETS[preset].note ? PRESETS[preset].note + " Move any slider to fine-tune." : "";
     for (const b of cutRow.children) b.setAttribute("aria-pressed", Math.abs(+b.dataset.cut - st.annualCut) < 500);
     const p = params(), o = landlordModel(p), v = verdict(o);
     $("vbadge").className = "vbadge " + v.cls; $("vbadge").textContent = v.badge; $("vhead").textContent = v.head;
@@ -487,6 +494,7 @@ function bisect(f, lo, hi) {
   render();
 })();
 </script>
+
 
 </body>
 </html>
